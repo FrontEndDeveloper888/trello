@@ -26,6 +26,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Modal } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import Stack from "@mui/material/Stack";
 
 const drawerWidth = 200;
 
@@ -164,6 +166,13 @@ export default function MiniDrawer(props) {
         }
     };
 
+    const handleTrashBoard = () => {
+        const updatedBoards = [...boards];
+        updatedBoards.splice(activeBoardIndex, 1);
+        setBoards(updatedBoards);
+        handleCloseEditBoardModal();
+    };
+
     return (
         <Box
             sx={{
@@ -210,7 +219,9 @@ export default function MiniDrawer(props) {
                                     justifyContent: open ? "initial" : "center",
                                     px: 2.5,
                                 }}
-                                onClick={() => handleOpenEditBoardModal(index, board.title)}
+                                active={activeBoardIndex === index}
+                                open={open}
+                                onClick={() => setActiveBoardIndex(index)}
                             >
                                 <ListItemIcon
                                     sx={{
@@ -219,13 +230,34 @@ export default function MiniDrawer(props) {
                                         justifyContent: "center",
                                     }}
                                 >
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                    {index % 2 === 0 ? <InboxIcon /> : <InboxIcon />}
                                 </ListItemIcon>
                                 <ListItemText
-                                    onClick={() => handleOpenEditBoardModal(index, board.title)}
                                     primary={board.title}
                                     sx={{ opacity: open ? 1 : 0, color: "inherit" }}
                                 />
+                                {activeBoardIndex === index && (
+                                <Box>
+                                    <Stack direction="row">
+                                        <IconButton
+                                            color="inherit"
+                                            edge="end"
+                                            onClick={() => handleOpenEditBoardModal(index, board.title)}
+                                            sx={{ display: open ? "block" : "none" }}
+                                        >
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                        <IconButton
+                                            color="inherit"
+                                            edge="end"
+                                            onClick={() => handleTrashBoard(index)}
+                                            sx={{ display: open ? "block" : "none" }}
+                                        >
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </Stack>
+                                </Box>
+                            )}
                             </ListItemButton>
                         </ListItem>
                     ))}
@@ -278,12 +310,10 @@ export default function MiniDrawer(props) {
                 </List>
                 <Divider />
             </Drawer>
-
             <Box component="main" sx={styles.main}>
                 <DrawerHeader />
                 {props.children}
             </Box>
-
             <Modal open={isBoardModalOpen} onClose={handleAddBoardModalClose}>
                 <Box
                     sx={{
@@ -306,7 +336,6 @@ export default function MiniDrawer(props) {
                         placeholder="Board title..."
                         size="small"
                     />
-
                     <Button onClick={handleAddBoardConfirm} variant="contained" sx={{ p: 1, ml: 1 }}>
                         + Add
                     </Button>
@@ -334,7 +363,6 @@ export default function MiniDrawer(props) {
                         placeholder="Board title..."
                         size="small"
                     />
-
                     <Button onClick={handleEditBoardTitle} variant="contained" sx={{ p: 1, ml: 1 }}>
                         Save
                     </Button>
