@@ -1,5 +1,5 @@
-import * as React from "react";
-import {styled, useTheme} from "@mui/material/styles";
+import React, { useContext, useState } from "react";
+import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
@@ -18,27 +18,33 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
-import {useContext} from "react";
-import {BoardsContext} from "../../context";
-import {styles} from "../Board/styles";
+import { BoardsContext } from "../../context";
+import { styles } from "../Board/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ErrorIcon from "@mui/icons-material/Error";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {Modal} from "@mui/material";
+import { Modal } from "@mui/material";
 
 const drawerWidth = 200;
 
 const openedMixin = (theme) => ({
-    width: drawerWidth, transition: theme.transitions.create("width", {
-        easing: theme.transitions.easing.sharp, duration: theme.transitions.duration.enteringScreen,
-    }), background: "rgba(255,255,255,0.1)", backdropFilter: "blur(5px)", overflowX: "hidden", color: "white",
+    width: drawerWidth,
+    transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+    }),
+    background: "rgba(255,255,255,0.1)",
+    backdropFilter: "blur(5px)",
+    overflowX: "hidden",
+    color: "white",
 });
 
 const closedMixin = (theme) => ({
     transition: theme.transitions.create("width", {
-        easing: theme.transitions.easing.sharp, duration: theme.transitions.duration.leavingScreen,
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
     }),
     background: "rgba(255,255,255,0.1)",
     backdropFilter: "blur(5px)",
@@ -50,43 +56,62 @@ const closedMixin = (theme) => ({
     color: "white",
 });
 
-const DrawerHeader = styled("div")(({theme}) => ({
+const DrawerHeader = styled("div")(({ theme }) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
-    padding: theme.spacing(0, 1), ...theme.mixins.toolbar,
+    padding: theme.spacing(0, 1),
+    ...theme.mixins.toolbar,
 }));
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== "open",
-})(({theme, open}) => ({
-    zIndex: theme.zIndex.drawer + 1, transition: theme.transitions.create(["width", "margin"], {
-        easing: theme.transitions.easing.sharp, duration: theme.transitions.duration.leavingScreen,
-    }), ...(open && {
+})(({ theme, open }) => ({
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(["width", "margin"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
         marginLeft: drawerWidth,
         width: `calc(100% - ${drawerWidth}px)`,
         transition: theme.transitions.create(["width", "margin"], {
-            easing: theme.transitions.easing.sharp, duration: theme.transitions.duration.enteringScreen,
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
         }),
-    }), backgroundColor: "rgba(0, 0, 0, 0.7)", backdropFilter: "blur(5px)",
+    }),
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    backdropFilter: "blur(5px)",
 }));
 
 const Drawer = styled(MuiDrawer, {
     shouldForwardProp: (prop) => prop !== "open",
-})(({theme, open}) => ({
-    width: drawerWidth, flexShrink: 0, whiteSpace: "nowrap", boxSizing: "border-box", ...(open && {
-        ...openedMixin(theme), "& .MuiDrawer-paper": openedMixin(theme),
-    }), ...(!open && {
-        ...closedMixin(theme), "& .MuiDrawer-paper": closedMixin(theme),
+})(({ theme, open }) => ({
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: "nowrap",
+    boxSizing: "border-box",
+    ...(open && {
+        ...openedMixin(theme),
+        "& .MuiDrawer-paper": openedMixin(theme),
+    }),
+    ...(!open && {
+        ...closedMixin(theme),
+        "& .MuiDrawer-paper": closedMixin(theme),
     }),
 }));
 
 export default function MiniDrawer(props) {
     const theme = useTheme();
-    const [open, setOpen] = React.useState(false);
-    const [isBoardModalOpen, setIsBoardModalOpen] = React.useState(false);
-    const [newBoardTitle, setNewBoardTitle] = React.useState("");
-    const {boards, setBoards, activeBoardIndex, setActiveBoardIndex} = useContext(BoardsContext);
+    const [open, setOpen] = useState(false);
+    const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
+    const [newBoardTitle, setNewBoardTitle] = useState("");
+    const { boards, setBoards, activeBoardIndex, setActiveBoardIndex } =
+        useContext(BoardsContext);
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editedBoardIndex, setEditedBoardIndex] = useState(null);
+    const [editedBoardTitle, setEditedBoardTitle] = useState("");
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -112,140 +137,209 @@ export default function MiniDrawer(props) {
     const handleAddBoardConfirm = () => {
         if (newBoardTitle.trim()) {
             const updatedBoards = [...boards];
-            updatedBoards.push({title: newBoardTitle, lists: []});
+            updatedBoards.push({ title: newBoardTitle, lists: [] });
             setBoards(updatedBoards);
             handleAddBoardModalClose();
         }
     };
 
+    const handleOpenEditBoardModal = (boardIndex, boardTitle) => {
+        setIsEditModalOpen(true);
+        setEditedBoardIndex(boardIndex);
+        setEditedBoardTitle(boardTitle);
+    };
 
-    return (<Box sx={{
-        display: "flex",
-        minHeight: 1001,
-        background: "rgba(0, 0, 0, 0.7)",
-        backgroundImage: "url(https://i.pinimg.com/originals/47/0a/19/470a19a36904fe200610cc1f41eb00d9.jpg)",
-        backgroundSize: "cover"
-    }}>
-        <CssBaseline/>
-        <AppBar position="fixed" open={open}>
-            <Toolbar>
-                <IconButton
-                    color="inherit"
-                    aria-label="open drawer"
-                    onClick={handleDrawerOpen}
-                    edge="start"
-                    sx={{
-                        marginRight: 5, ...(open && {display: "none"}),
-                    }}
-                >
-                    <MenuIcon/>
-                </IconButton>
-                <Typography variant="h6" noWrap component="div">
-                    Trello
-                </Typography>
-            </Toolbar>
-        </AppBar>
-        <Drawer variant="permanent" open={open}>
-            <DrawerHeader>
-                <IconButton onClick={handleDrawerClose}>
-                    {theme.direction === "rtl" ? (<ChevronRightIcon/>) : (<ChevronLeftIcon/>)}
-                </IconButton>
-            </DrawerHeader>
-            <Divider/>
-            <List>
-                {boards.map((board, index) => (<ListItem key={index} disablePadding sx={{display: "block"}}>
-                    <ListItemButton
+    const handleCloseEditBoardModal = () => {
+        setIsEditModalOpen(false);
+        setEditedBoardIndex(null);
+        setEditedBoardTitle("");
+    };
+
+    const handleEditBoardTitle = () => {
+        if (editedBoardTitle.trim()) {
+            const updatedBoards = [...boards];
+            updatedBoards[editedBoardIndex].title = editedBoardTitle;
+            setBoards(updatedBoards);
+            handleCloseEditBoardModal();
+        }
+    };
+
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                minHeight: 1001,
+                background: "rgba(0, 0, 0, 0.7)",
+                backgroundImage:
+                    "url(https://i.pinimg.com/originals/47/0a/19/470a19a36904fe200610cc1f41eb00d9.jpg)",
+                backgroundSize: "cover",
+            }}
+        >
+            <CssBaseline />
+            <AppBar position="fixed" open={open}>
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={open ? handleDrawerClose : handleDrawerOpen}
+                        edge="start"
                         sx={{
-                            minHeight: 48, justifyContent: open ? "initial" : "center", px: 2.5,
+                            marginRight: 5,
                         }}
-                        onClick={() => setActiveBoardIndex(index)}
                     >
-                        <ListItemIcon
-                            sx={{
-                                minWidth: 0, mr: open ? 3 : "auto", justifyContent: "center",
-                            }}
-                        >
-                            {index % 2 === 0 ? <InboxIcon/> : <InboxIcon/>}
-                        </ListItemIcon>
-                        <ListItemText
-                            primary={board.title}
-                            sx={{opacity: open ? 1 : 0, color: "inherit"}}
-                        />
-                    </ListItemButton>
-                </ListItem>))}
-                <ListItem disablePadding sx={{display: "block"}}>
-                    <ListItemButton
-                        sx={{
-                            minHeight: 48, justifyContent: open ? "initial" : "center", px: 2.5,
-                        }}
-                        onClick={handleAddBoard}
-                    >
-                        <ListItemIcon
-                            sx={{
-                                minWidth: 0, mr: open ? 3 : "auto", justifyContent: "center",
-                            }}
-                        >
-                            <AddCircleOutlineIcon/>
-                        </ListItemIcon>
-                        <ListItemText primary="+ Add board" sx={{opacity: open ? 1 : 0}}/>
-                    </ListItemButton>
-                </ListItem>
-            </List>
-            <Divider/>
-            <List>
-                {["All mail", "Trash", "Spam"].map((text, index) => (
-                    <ListItem key={text} disablePadding sx={{display: "block"}}>
+                        {open ? <ChevronLeftIcon /> : <MenuIcon />}
+                    </IconButton>
+                    <Typography variant="h6" noWrap component="div">
+                        Trello
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Drawer variant="permanent" open={open}>
+                <DrawerHeader>
+                    <IconButton onClick={handleDrawerClose}>
+                        {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                    </IconButton>
+                </DrawerHeader>
+                <Divider />
+                <List>
+                    {boards.map((board, index) => (
+                        <ListItem key={index} disablePadding sx={{ display: "block" }}>
+                            <ListItemButton
+                                sx={{
+                                    minHeight: 48,
+                                    justifyContent: open ? "initial" : "center",
+                                    px: 2.5,
+                                }}
+                                onClick={() => handleOpenEditBoardModal(index, board.title)}
+                            >
+                                <ListItemIcon
+                                    sx={{
+                                        minWidth: 0,
+                                        mr: open ? 3 : "auto",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                </ListItemIcon>
+                                <ListItemText
+                                    onClick={() => handleOpenEditBoardModal(index, board.title)}
+                                    primary={board.title}
+                                    sx={{ opacity: open ? 1 : 0, color: "inherit" }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                    <ListItem disablePadding sx={{ display: "block" }}>
                         <ListItemButton
                             sx={{
-                                minHeight: 48, justifyContent: open ? "initial" : "center", px: 2.5,
+                                minHeight: 48,
+                                justifyContent: open ? "initial" : "center",
+                                px: 2.5,
                             }}
+                            onClick={handleAddBoard}
                         >
                             <ListItemIcon
                                 sx={{
-                                    minWidth: 0, mr: open ? 3 : "auto", justifyContent: "center",
+                                    minWidth: 0,
+                                    mr: open ? 3 : "auto",
+                                    justifyContent: "center",
                                 }}
                             >
-                                {index === 0 ? <MailIcon/> : index === 1 ? <DeleteIcon/> : <ErrorIcon/>}
+                                <AddCircleOutlineIcon />
                             </ListItemIcon>
-                            <ListItemText primary={text} sx={{opacity: open ? 1 : 0}}/>
+                            <ListItemText primary="+ Add board" sx={{ opacity: open ? 1 : 0 }} />
                         </ListItemButton>
-                    </ListItem>))}
-            </List>
-            <Divider/>
-        </Drawer>
+                    </ListItem>
+                </List>
+                <Divider />
+                <List>
+                    {["All mail", "Trash", "Spam"].map((text, index) => (
+                        <ListItem key={text} disablePadding sx={{ display: "block" }}>
+                            <ListItemButton
+                                sx={{
+                                    minHeight: 48,
+                                    justifyContent: open ? "initial" : "center",
+                                    px: 2.5,
+                                }}
+                            >
+                                <ListItemIcon
+                                    sx={{
+                                        minWidth: 0,
+                                        mr: open ? 3 : "auto",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    {index === 0 ? <MailIcon /> : index === 1 ? <DeleteIcon /> : <ErrorIcon />}
+                                </ListItemIcon>
+                                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
+                <Divider />
+            </Drawer>
 
-        <Box component="main" sx={styles.main}>
-            <DrawerHeader/>
-            {props.children}
-        </Box>
-
-        <Modal open={isBoardModalOpen} onClose={handleAddBoardModalClose}>
-            <Box
-                sx={{
-                    position: "absolute",
-                    top: "20%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    bg: "white",
-                    p: 2,
-                    m: 1,
-                    outline: "none",
-                    borderRadius: 3,
-                    backgroundColor: "rgba(255,255,255,0.7)",
-                }}
-            >
-                <TextField
-                    value={newBoardTitle}
-                    color="primary"
-                    onChange={(e) => setNewBoardTitle(e.target.value)}
-                    placeholder="Board title..."
-                    size="small"
-                />
-
-                <Button onClick={handleAddBoardConfirm} variant="contained" sx={{p: 1, ml: 1}}>
-                    + Add
-                </Button>
+            <Box component="main" sx={styles.main}>
+                <DrawerHeader />
+                {props.children}
             </Box>
-        </Modal>
-    </Box>);
+
+            <Modal open={isBoardModalOpen} onClose={handleAddBoardModalClose}>
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: "20%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        bg: "white",
+                        p: 2,
+                        m: 1,
+                        outline: "none",
+                        borderRadius: 3,
+                        backgroundColor: "rgba(255,255,255,0.7)",
+                    }}
+                >
+                    <TextField
+                        value={newBoardTitle}
+                        color="primary"
+                        onChange={(e) => setNewBoardTitle(e.target.value)}
+                        placeholder="Board title..."
+                        size="small"
+                    />
+
+                    <Button onClick={handleAddBoardConfirm} variant="contained" sx={{ p: 1, ml: 1 }}>
+                        + Add
+                    </Button>
+                </Box>
+            </Modal>
+            <Modal open={isEditModalOpen} onClose={handleCloseEditBoardModal}>
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: "20%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        bg: "white",
+                        p: 2,
+                        m: 1,
+                        outline: "none",
+                        borderRadius: 3,
+                        backgroundColor: "rgba(255, 255, 255, 0.7)",
+                    }}
+                >
+                    <TextField
+                        value={editedBoardTitle}
+                        color="primary"
+                        onChange={(e) => setEditedBoardTitle(e.target.value)}
+                        placeholder="Board title..."
+                        size="small"
+                    />
+
+                    <Button onClick={handleEditBoardTitle} variant="contained" sx={{ p: 1, ml: 1 }}>
+                        Save
+                    </Button>
+                </Box>
+            </Modal>
+        </Box>
+    );
 }
