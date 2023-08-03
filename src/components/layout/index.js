@@ -245,27 +245,27 @@ export default function MiniDrawer(props) {
                                     sx={{ opacity: open ? 1 : 0, color: "inherit" }}
                                 />
                                 {activeBoardIndex === index && (
-                                <Box>
-                                    <Stack direction="row">
-                                        <IconButton
-                                            color="inherit"
-                                            edge="end"
-                                            onClick={() => handleOpenEditBoardModal(index, board.title)}
-                                            sx={{ display: open ? "block" : "none" }}
-                                        >
-                                            <EditIcon fontSize="small" />
-                                        </IconButton>
-                                        <IconButton
-                                            color="inherit"
-                                            edge="end"
-                                            onClick={() => handleTrashBoard(index)}
-                                            sx={{ display: open ? "block" : "none" }}
-                                        >
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    </Stack>
-                                </Box>
-                            )}
+                                    <Box>
+                                        <Stack direction="row">
+                                            <IconButton
+                                                color="inherit"
+                                                edge="end"
+                                                onClick={() => handleOpenEditBoardModal(index, board.title)}
+                                                sx={{ display: open ? "block" : "none" }}
+                                            >
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton
+                                                color="inherit"
+                                                edge="end"
+                                                onClick={() => handleTrashBoard(index)}
+                                                sx={{ display: open ? "block" : "none" }}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Stack>
+                                    </Box>
+                                )}
                             </ListItemButton>
                         </ListItem>
                     ))}
