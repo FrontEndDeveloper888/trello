@@ -30,9 +30,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import Stack from "@mui/material/Stack";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Menu } from "@mui/material";
-import { MenuItem } from "@mui/material";
 
-const drawerWidth = 300;
+const drawerWidth = 200;
 
 const openedMixin = (theme) => ({
     width: drawerWidth,
@@ -111,7 +110,8 @@ export default function MiniDrawer(props) {
     const [open, setOpen] = useState(false);
     const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
     const [newBoardTitle, setNewBoardTitle] = useState("");
-    const { boards, setBoards, activeBoardIndex, setActiveBoardIndex } = useContext(BoardsContext);
+    const { boards, setBoards, activeBoardIndex, setActiveBoardIndex } =
+        useContext(BoardsContext);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editedBoardIndex, setEditedBoardIndex] = useState(null);
@@ -268,7 +268,8 @@ export default function MiniDrawer(props) {
                                                 onClick={(event) => handleBoardMenuOpen(event, index)}
                                                 sx={{ display: open ? "block" : "none" }}
                                             >
-                                                <MoreVertIcon fontSize="small" sx={{ color: "white" }} /> {/* Icon rangi oq (white) */}
+                                                <MoreVertIcon fontSize="small" sx={{ color: "white" }} />{" "}
+                                                {/* Icon rangi oq (white) */}
                                             </IconButton>
                                         </Stack>
                                         <Menu
@@ -284,8 +285,7 @@ export default function MiniDrawer(props) {
                                                 },
                                             }}
                                         >
-
-                                        <ListItemButton onClick={() => handleOpenEditBoardModal(index, board.title)}>
+                                            <ListItemButton onClick={() => handleOpenEditBoardModal(index, board.title)}>
                                                 <ListItemIcon>
                                                     <EditIcon fontSize="small" /> {/* Icon rangi oq (white) */}
                                                 </ListItemIcon>
@@ -293,14 +293,13 @@ export default function MiniDrawer(props) {
                                             </ListItemButton>
                                             <ListItemButton onClick={() => handleTrashBoard(index)}>
                                                 <ListItemIcon>
-                                                    <DeleteIcon/> {/* Icon rangi oq (white) */}
+                                                    <DeleteIcon /> {/* Icon rangi oq (white) */}
                                                 </ListItemIcon>
-                                                <ListItemText primary="Delete"/> {/* Text rangi oq (white) */}
+                                                <ListItemText primary="Delete" /> {/* Text rangi oq (white) */}
                                             </ListItemButton>
                                             {/* Qolgan menyu elementlarini ham shaffof qilish uchun sx={{ color: "white" }} sozlovini qo'shing */}
                                         </Menu>
                                     </Box>
-
                                 )}
                             </ListItemButton>
                         </ListItem>
