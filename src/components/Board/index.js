@@ -1,3 +1,4 @@
+import React, { useContext, useState } from "react";
 import {
     Stack,
     Box,
@@ -6,26 +7,26 @@ import {
     Modal,
     TextField,
 } from "@mui/material";
-import * as React from "react";
-import { useContext, useState } from "react";
 import { BoardsContext } from "../../context";
 import { StyledList, styles } from "./styles";
 import { TaskDialog } from "../TaskDialog";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-export const Board = (props) => {
-    const { boards, setBoards, activeBoardIndex, setActiveBoardIndex } =
-        useContext(BoardsContext);
+export const Board = () => {
+    // Get data from the context
+    const { boards, setBoards, activeBoardIndex } = useContext(BoardsContext);
 
-    const [open, setOpen] = React.useState(false);
-    const [listIndex, setListIndex] = React.useState(null);
-    const [taskIndex, setTaskIndex] = React.useState(null);
+    // States for various actions and modals
+    const [open, setOpen] = useState(false);
+    const [listIndex, setListIndex] = useState(null);
+    const [taskIndex, setTaskIndex] = useState(null);
     const [newListTitle, setNewListTitle] = useState("");
-    const [openTaskModal, setOpenTaskModal] = React.useState(false);
+    const [openTaskModal, setOpenTaskModal] = useState(false);
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [editListTitle, setEditListTitle] = useState("");
-    const [openTaskEditModal, setOpenTaskEditModal] = React.useState(false);
+    const [openTaskEditModal, setOpenTaskEditModal] = useState(false);
 
+    // Function to handle closing modals
     const handleClose = () => {
         setOpen(false);
         setListIndex(null);
@@ -33,11 +34,14 @@ export const Board = (props) => {
         setNewListTitle("");
     };
 
+    // Function to open "Add Task" modal
     const handleAddTaskModal = (listIndex) => {
         setOpenTaskModal(true);
         setListIndex(listIndex);
+        setTaskIndex(null);
     };
 
+    // Function to add a new task to a list
     const handleAddTask = (listIndex) => {
         if (newTaskTitle.trim() === "") {
             return;
@@ -51,6 +55,7 @@ export const Board = (props) => {
         setNewTaskTitle("");
     };
 
+    // Function to add a new list
     const handleAddList = () => {
         if (newListTitle.trim() === "") {
             return;
@@ -63,18 +68,21 @@ export const Board = (props) => {
         handleClose();
     };
 
+    // Function to delete a list
     const handleDeleteList = (listIndex) => {
         const updatedBoards = [...boards];
         updatedBoards[activeBoardIndex].lists.splice(listIndex, 1);
         setBoards(updatedBoards);
     };
 
+    // Function to open "Edit List Title" modal
     const handleEditListModal = (listIndex) => {
         setOpenTaskEditModal(true);
         setListIndex(listIndex);
         setEditListTitle(boards[activeBoardIndex].lists[listIndex].title);
     };
 
+    // Function to save the edited list title
     const handleEditList = () => {
         if (editListTitle.trim() === "") {
             return;
@@ -85,41 +93,59 @@ export const Board = (props) => {
         setOpenTaskEditModal(false);
     };
 
+    const handleDeleteTask = (listIndex, taskIndex) => {
+        const updatedBoards = [...boards];
+        updatedBoards[activeBoardIndex].lists[listIndex].tasks.splice(taskIndex, 1);
+        setBoards(updatedBoards);
+    };
 
     return (
         <Stack direction="row" spacing={2}>
+            {/* Modal for displaying task details */}
             <TaskDialog
                 values={{ listIndex, taskIndex }}
                 open={open}
                 onClose={handleClose}
             />
             {boards[activeBoardIndex].lists.map((list, listIdx) => (
-                <StyledList>
-                    <Typography onClick={() => handleEditListModal(listIdx)} sx={{ mb: 2 ,cursor:"pointer"}}>{list.title}</Typography>
+                <StyledList key={listIdx}>
+                    {/* Clicking on list title opens "Edit List Title" modal */}
+                    <Typography
+                        onClick={() => handleEditListModal(listIdx)}
+                        sx={{ mb: 2, cursor: "pointer" }}
+                    >
+                        {list.title}
+                    </Typography>
                     <Box>
                         {list.tasks.map((task, taskIdx) => (
                             <Box className="list" key={taskIdx}>
                                 <Typography>{task.title}</Typography>
+                                <DeleteIcon sx={{ color: "red" }} onClick={() => handleDeleteTask(listIdx, taskIdx)} />
                             </Box>
                         ))}
                     </Box>
+                    {/* Button to open "Add Task" modal */}
                     <Button
                         sx={styles.buttonTask}
                         onClick={() => handleAddTaskModal(listIdx)}
                     >
-                        + Yangi Task
+                        + Add Task
                     </Button>
+                    {/* Button to delete the list */}
                     <Button
                         sx={styles.buttonTask}
-                        onClick={() => handleDeleteList(listIdx)}>
-                        - List
+                        onClick={() => handleDeleteList(listIdx)}
+                    >
+                        - Delete List
                     </Button>
                 </StyledList>
             ))}
+            {/* Button to open "Add New List" modal */}
             <Button sx={styles.button} onClick={() => setOpen(true)}>
-                + Yangi List
+                + Add New List
             </Button>
 
+            {/* Modal for adding a new list */}
             <Modal open={open} onClose={handleClose}>
                 <Box
                     sx={{
@@ -148,8 +174,11 @@ export const Board = (props) => {
                 </Box>
             </Modal>
 
-            {/* Task qo'shish uchun modal */}
-            <Modal open={openTaskModal} onClose={() => setOpenTaskModal(false)}>
+            {/* Modal for adding a new task */}
+            <Modal
+                open={openTaskModal}
+                onClose={() => setOpenTaskModal(false)}
+            >
                 <Box
                     sx={{
                         position: "absolute",
@@ -180,7 +209,12 @@ export const Board = (props) => {
                     </Button>
                 </Box>
             </Modal>
-            <Modal  open={openTaskEditModal} onClose={() => setOpenTaskEditModal(false)}>
+
+            {/* Modal for editing list title */}
+            <Modal
+                open={openTaskEditModal}
+                onClose={() => setOpenTaskEditModal(false)}
+            >
                 <Box
                     sx={{
                         position: "absolute",
@@ -202,7 +236,11 @@ export const Board = (props) => {
                         placeholder="List title..."
                         size="small"
                     />
-                    <Button onClick={handleEditList} variant="contained" sx={{ p: 1, ml: 1 }}>
+                    <Button
+                        onClick={handleEditList}
+                        variant="contained"
+                        sx={{ p: 1, ml: 1 }}
+                    >
                         Save List Title
                     </Button>
                 </Box>

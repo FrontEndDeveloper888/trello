@@ -28,8 +28,11 @@ import Button from "@mui/material/Button";
 import { Modal } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import Stack from "@mui/material/Stack";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Menu } from "@mui/material";
+import { MenuItem } from "@mui/material";
 
-const drawerWidth = 200;
+const drawerWidth = 300;
 
 const openedMixin = (theme) => ({
     width: drawerWidth,
@@ -108,12 +111,14 @@ export default function MiniDrawer(props) {
     const [open, setOpen] = useState(false);
     const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
     const [newBoardTitle, setNewBoardTitle] = useState("");
-    const { boards, setBoards, activeBoardIndex, setActiveBoardIndex } =
-        useContext(BoardsContext);
+    const { boards, setBoards, activeBoardIndex, setActiveBoardIndex } = useContext(BoardsContext);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editedBoardIndex, setEditedBoardIndex] = useState(null);
     const [editedBoardTitle, setEditedBoardTitle] = useState("");
+
+    const [boardMenuOpen, setBoardMenuOpen] = useState(null);
+    const [boardAnchorEl, setBoardAnchorEl] = useState(null);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -171,6 +176,16 @@ export default function MiniDrawer(props) {
         updatedBoards.splice(activeBoardIndex, 1);
         setBoards(updatedBoards);
         handleCloseEditBoardModal();
+    };
+
+    const handleBoardMenuClose = () => {
+        setBoardMenuOpen(null);
+        setBoardAnchorEl(null);
+    };
+
+    const handleBoardMenuOpen = (event, index) => {
+        setBoardMenuOpen(index);
+        setBoardAnchorEl(event.currentTarget);
     };
 
     return (
@@ -246,25 +261,46 @@ export default function MiniDrawer(props) {
                                 />
                                 {activeBoardIndex === index && (
                                     <Box>
-                                        <Stack direction="row">
+                                        <Stack direction="row" justifyContent="flex-start">
                                             <IconButton
                                                 color="inherit"
-                                                edge="end"
-                                                onClick={() => handleOpenEditBoardModal(index, board.title)}
+                                                edge="start"
+                                                onClick={(event) => handleBoardMenuOpen(event, index)}
                                                 sx={{ display: open ? "block" : "none" }}
                                             >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                color="inherit"
-                                                edge="end"
-                                                onClick={() => handleTrashBoard(index)}
-                                                sx={{ display: open ? "block" : "none" }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
+                                                <MoreVertIcon fontSize="small" sx={{ color: "white" }} /> {/* Icon rangi oq (white) */}
                                             </IconButton>
                                         </Stack>
+                                        <Menu
+                                            anchorEl={boardAnchorEl}
+                                            open={boardMenuOpen === index}
+                                            onClose={handleBoardMenuClose}
+                                            MenuProps={{
+                                                PaperProps: {
+                                                    sx: {
+                                                        background: "none", // Orqa fon rangi shaffof (yarimurch)
+                                                        width: "100px", // Menu o'lchami
+                                                    },
+                                                },
+                                            }}
+                                        >
+
+                                        <ListItemButton onClick={() => handleOpenEditBoardModal(index, board.title)}>
+                                                <ListItemIcon>
+                                                    <EditIcon fontSize="small" /> {/* Icon rangi oq (white) */}
+                                                </ListItemIcon>
+                                                <ListItemText primary="Edit" /> {/* Text rangi oq (white) */}
+                                            </ListItemButton>
+                                            <ListItemButton onClick={() => handleTrashBoard(index)}>
+                                                <ListItemIcon>
+                                                    <DeleteIcon/> {/* Icon rangi oq (white) */}
+                                                </ListItemIcon>
+                                                <ListItemText primary="Delete"/> {/* Text rangi oq (white) */}
+                                            </ListItemButton>
+                                            {/* Qolgan menyu elementlarini ham shaffof qilish uchun sx={{ color: "white" }} sozlovini qo'shing */}
+                                        </Menu>
                                     </Box>
+
                                 )}
                             </ListItemButton>
                         </ListItem>

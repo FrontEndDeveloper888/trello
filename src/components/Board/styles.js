@@ -31,6 +31,8 @@ export const StyledList = styled(Box)`
       border-radius: 8px;
       padding: 10px;
       margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
       background-color: #22272b;
       backdrop-filter: blur(1px);
     }
