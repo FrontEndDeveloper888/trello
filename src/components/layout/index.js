@@ -196,7 +196,7 @@ export default function MiniDrawer(props) {
                             marginRight: 5,
                         }}
                     >
-                        {open ? <ChevronLeftIcon /> : <MenuIcon />}
+                        {open ? null : <MenuIcon />}
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
                         Trello
@@ -234,6 +234,14 @@ export default function MiniDrawer(props) {
                                 </ListItemIcon>
                                 <ListItemText
                                     primary={board.title}
+                                    primaryTypographyProps={{
+                                        noWrap: true,
+                                        style: {
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
+                                        },
+                                    }}
                                     sx={{ opacity: open ? 1 : 0, color: "inherit" }}
                                 />
                                 {activeBoardIndex === index && (
