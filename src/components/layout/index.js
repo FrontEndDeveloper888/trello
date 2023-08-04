@@ -281,7 +281,7 @@ export default function MiniDrawer(props) {
                                                     sx: {
                                                         background: "none", // Orqa fon rangi shaffof (yarimurch)
                                                         width: "100px", // Menu o'lchami
-                                                    },
+                                                    }
                                                 },
                                             }}
                                         >
