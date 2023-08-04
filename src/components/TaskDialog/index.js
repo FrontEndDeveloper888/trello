@@ -1,4 +1,4 @@
-import {Modal, Box, Button, TextField} from "@mui/material";
+import {Modal, Box, Button, TextField, Dialog} from "@mui/material";
 import React, {useContext, useState} from "react";
 import {BoardsContext} from "../../context";
 
@@ -25,21 +25,15 @@ export const TaskDialog = (props) => {
         } : board));
     };
 
-    return (<Modal open={open} onClose={handleClose}>
+    return (
+        <Dialog open={open} onClose={handleClose}>
         <Box
             sx={{
-                position: "absolute",
-                top: "20%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                bg: "white",
-                p: 2,
-                m: 1,
-                outline: "none",
-                borderRadius: 3,
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
+
             }}
         >
+            vhjvvjhvh
+            <Button>bhvhvhhhjvvh</Button>
             {listIndex !== null && taskIndex !== null && activeBoardIndex !== null ? (<>
                 <TextField
                     id="standard-basic"
@@ -60,5 +54,5 @@ export const TaskDialog = (props) => {
                 />
             </>) : null}
         </Box>
-    </Modal>);
+    </Dialog>);
 };
