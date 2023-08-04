@@ -83,10 +83,7 @@ export const Board = () => {
 
     const handleDeleteTask = (listIndex, taskIndex) => {
         const updatedBoards = [...boards];
-        updatedBoards[activeBoardIndex].lists[listIndex].tasks.splice(
-            taskIndex,
-            1
-        );
+        updatedBoards[activeBoardIndex].lists[listIndex].tasks.splice(taskIndex, 1);
         setBoards(updatedBoards);
     };
 
@@ -95,34 +92,27 @@ export const Board = () => {
     };
 
     const onDragEnd = (result) => {
-        setIsDragging(false);
-
+        setIsDragging(false); // Reset isDragging after finishing the drag
         if (!result.destination) return;
-
         const { source, destination } = result;
+
         const startListIndex = +source.droppableId;
         const endListIndex = +destination.droppableId;
+
         const startTaskIndex = +source.index;
         const endTaskIndex = +destination.index;
 
-        if (startListIndex === endListIndex) {
-            // If the task is moved within the same list
-            const boardsClone = JSON.parse(JSON.stringify(boards));
-            const [task] = boardsClone[activeBoardIndex].lists[startListIndex].tasks.splice(startTaskIndex, 1);
-            boardsClone[activeBoardIndex].lists[startListIndex].tasks.splice(endTaskIndex, 0, task);
-            setBoards(boardsClone);
-        } else {
-            // If the task is moved to a different list
-            const boardsClone = JSON.parse(JSON.stringify(boards));
-            const [task] = boardsClone[activeBoardIndex].lists[startListIndex].tasks.splice(startTaskIndex, 1);
-            boardsClone[activeBoardIndex].lists[endListIndex].tasks.splice(endTaskIndex, 0, task);
-            setBoards(boardsClone);
-        }
+        const boardsClone = JSON.parse(JSON.stringify(boards));
+
+        const [task] = boardsClone[activeBoardIndex].lists[startListIndex].tasks.splice(startTaskIndex, 1);
+
+        boardsClone[activeBoardIndex].lists[endListIndex].tasks.splice(endTaskIndex, 0, task);
+
+        setBoards(boardsClone);
     };
 
-
     return (
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} >
             <TaskDialog values={{ listIndex, taskIndex }} open={open} onClose={handleClose} />
             <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
                 {boards[activeBoardIndex].lists.map((list, listIdx) => (
@@ -149,12 +139,14 @@ export const Board = () => {
                                         </Draggable>
                                     ))}
                                 </Box>
-                                <Button sx={styles.buttonTask} onClick={() => handleAddTaskModal(listIdx)}>
-                                    + Add Task
-                                </Button>
-                                <Button sx={styles.buttonTask} onClick={() => handleDeleteList(listIdx)}>
-                                    - Delete List
-                                </Button>
+                                <Box>
+                                    <Button sx={styles.buttonTask} onClick={() => handleAddTaskModal(listIdx)}>
+                                        + Add Task
+                                    </Button>
+                                    <Button sx={styles.buttonTask} onClick={() => handleDeleteList(listIdx)}>
+                                        - Delete List
+                                    </Button>
+                                </Box>
                             </StyledList>
                         )}
                     </Droppable>
@@ -191,7 +183,6 @@ export const Board = () => {
                     </Button>
                 </Box>
             </Modal>
-
             {/* Modal for adding a new task */}
             <Modal open={openTaskModal} onClose={() => setOpenTaskModal(false)}>
                 <Box
@@ -220,7 +211,6 @@ export const Board = () => {
                     </Button>
                 </Box>
             </Modal>
-
             {/* Modal for editing list title */}
             <Modal open={openTaskEditModal} onClose={() => setOpenTaskEditModal(false)}>
                 <Box
@@ -251,6 +241,4 @@ export const Board = () => {
             </Modal>
         </Stack>
     );
-};
-
-export default Board;
+}
